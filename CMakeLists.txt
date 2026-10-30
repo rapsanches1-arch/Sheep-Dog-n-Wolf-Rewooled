@@ -56,11 +56,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     message(STATUS "SheepD3D: Linux/${CMAKE_CXX_COMPILER_ID}")
 
+elseif(ANDROID)
+    message(STATUS "SheepD3D: Android")
 else()
-
     message(FATAL_ERROR
-            "SheepD3D supports Windows/MSVC, macOS and Linux only.")
-
+        "SheepD3D supports Windows/MSVC, macOS and Linux only.")
 endif()
 
 # ---------------------------------------------------------------------------
@@ -212,6 +212,17 @@ if(WIN32)
             src/platform/save_store.c
             src/platform/options.c
             )
+
+
+elseif(ANDROID)
+    add_library(SheepD3D SHARED
+        ${GAME_SRC}
+        src/compat/pure_slots.cpp
+        ${RENDER_SRC}
+        src/platform/save_store.c
+        src/platform/options.c
+    )
+    set_target_properties(SheepD3D PROPERTIES OUTPUT_NAME "main")
 
 else()
 
@@ -453,6 +464,8 @@ if(WIN32)
     set(SDW_LAUNCHER_KIND WIN32)
 endif()
 
+if(NOT ANDROID)
+
 add_executable(SheepLauncher ${SDW_LAUNCHER_KIND}
         src/launcher/launcher.cpp
         src/launcher/update_check.cpp
@@ -604,6 +617,9 @@ endif()
 # psxdav_convert: the game's PlayStation .DAV conversion (src/engine/psx_dav.cpp) as a command, for tools/retexture.py
 # ---------------------------------------------------------------------------
 
+endif() # NOT ANDROID
+
+if(NOT ANDROID)
 add_executable(psxdav_convert
         tools/psxdav_convert.cpp
         src/engine/psx_dav.cpp
@@ -612,6 +628,8 @@ add_executable(psxdav_convert
 target_include_directories(psxdav_convert PRIVATE
         src/include
         )
+
+endif() # NOT ANDROID
 
 # ---------------------------------------------------------------------------
 # macOS
